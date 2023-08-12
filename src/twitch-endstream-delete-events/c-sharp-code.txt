@@ -1,0 +1,48 @@
+using Newtonsoft.Json;
+using System;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Net;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+
+public class CPHInline
+{
+	private static readonly HttpClient _client = new();
+	
+	public bool Execute()
+	{
+		_client.BaseAddress = new Uri("https://discord.com/api//");
+        RemoveEvents();
+        Thread.Sleep(5000); // Since we can't 'force' the overried to async, I disappointingly added this to give the code enough time to complete before we exited out.
+		return true;
+	}
+	
+	 private static async void RemoveEvents()
+    {
+        var response = await GetAPIResponseAsync<dynamic>("guilds/<id-of-your-discord-server>/scheduled-events");
+
+        foreach (dynamic item in response)
+        {
+            await DeleteAPIResponseAsync($"guilds/<id-of-your-discord-server>/scheduled-events/{item["id"]}");
+        }
+    }
+	
+	private static async Task<T> GetAPIResponseAsync<T>(string path)
+    {
+        _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bot", "<discord-bot-token>");
+        using HttpResponseMessage response = await _client.GetAsync(path, HttpCompletionOption.ResponseHeadersRead);
+        response.EnsureSuccessStatusCode();
+        string responseText = await response.Content.ReadAsStringAsync();
+        return JsonConvert.DeserializeObject<T>(responseText);
+    }
+
+    private static async Task<HttpStatusCode> DeleteAPIResponseAsync(string path)
+    {
+        _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bot", "<discord-bot-token>");
+        using HttpResponseMessage response = await _client.DeleteAsync(path);
+        response.EnsureSuccessStatusCode();
+        return response.StatusCode;
+    }
+}

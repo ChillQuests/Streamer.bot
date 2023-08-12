@@ -10,7 +10,7 @@ public class CPHInline
 {
     public bool Execute()
     {
-        // Discord API endpoint for creaeting scheduled events
+        // Discord API endpoint for creating scheduled events
         string url = "https://discord.com/api/guilds/<id-of-your-discord-server>/scheduled-events";
         
         // Build API POST JSON payload (use an "Add target info for broadcaster" sub-action prior to "Execute Code")
