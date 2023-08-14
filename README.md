@@ -14,6 +14,7 @@ When your stream goes "live", your bot will create a scheduled event in your Dis
 
 Change Log:
 8/11/2023 - Initial Commit
+
 8/13/2023 - Add support for event specific logic (used to assist in "Go Offlne" code to only delete the event created during the "Go Live" event as to not blindly delete ALL events in case there are other events that we want to keep for other purposes.
 
 [twitch-endstream-delete-events](https://github.com/ChillQuests/Streamer.bot/tree/main/src/twitch-endstream-delete-events)
@@ -22,4 +23,5 @@ When your stream is finished and to go offline, this action will delete ONLY the
 
 Change Log:
 8/11/2023 - Initial Commit
+
 8/13/2023 - Add support for event specific logic (used to assist in "Go Offlne" code to only delete the event created during the "Go Live" event as to not blindly delete ALL events in case there are other events that we want to keep for other purposes.
