@@ -13,31 +13,40 @@ public class CPHInline
         // Discord API endpoint for creating scheduled events
         string url = "https://discord.com/api/guilds/<id-of-your-discord-server>/scheduled-events";
         
+        // Input vars
+        var streamTitle = args["targetChannelTitle"].ToString();
+        var streamLocation = string.Concat("https://www.twitch.tv/", args["targetUserName"].ToString())
+        var streamDescription = args["targetDescriptionEscaped"].ToString()
+        
         // Build API POST JSON payload (use an "Add target info for broadcaster" sub-action prior to "Execute Code")
         var content = JsonConvert.SerializeObject(new
 	    {
-	        name = args["targetChannelTitle"].ToString(),
+	        name = streamTitle,
 	        scheduled_start_time = DateTimeOffset.UtcNow.AddSeconds(5),
 	        scheduled_end_time = DateTimeOffset.UtcNow.AddDays(1),
 	        entity_type = 3,
 	        privacy_level = "2",
 	        entity_metadata = new
 	        {
-		    location = $"https://www.twitch.tv/{targetUserName}"
-		},
-	        description = args["targetDescriptionEscaped"].ToString()
-	    }
-        );
+		        location = streamLocation
+		    },
+	        description = streamDescription
+	    });
         
         // Init and prep http POST call
         // You'll need your Discord bot's token with "Manage Events" permission
-        using (HttpClient httpClient = new HttpClient())
+        using HttpClient httpClient = new();
+        var requestContent = new StringContent(content, Encoding.UTF8, "application/json");
+        httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bot", "<discord-bot-token>");
+
+        // Attempt POST and read the response to extract the newly created event id.
+        // We will save the event id as an SB global variable so we can cleanup when stream ends.
+        var response = httpClient.PostAsync(url, requestContent).Result;
+        if (response.Content != null && response.IsSuccessStatusCode)
         {
-            var requestContent = new StringContent(content, Encoding.UTF8, "application/json");
-            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bot", "<discord-bot-token>");
-            httpClient.PostAsync(url, requestContent).Wait();
-            httpClient.Dispose();
-            return true;
-        }
+            var jsonPayload = JsonConvert.DeserializeObject<dynamic>(response.Content.ReadAsStringAsync().Result);
+            CPH.SetGlobalVar("discordEventId", jsonPayload["id"], true);
+        };
+        return true;
     }
 }
