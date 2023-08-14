@@ -15,26 +15,26 @@ public class CPHInline
         
         // Build API POST JSON payload (use an "Add target info for broadcaster" sub-action prior to "Execute Code")
         var content = JsonConvert.SerializeObject(new
-			{
-				name = args["targetChannelTitle"].ToString(),
-				scheduled_start_time = DateTimeOffset.UtcNow.AddSeconds(5),
-                scheduled_end_time = DateTimeOffset.UtcNow.AddDays(1),
-				entity_type = 3,
-				privacy_level = "2",
-				entity_metadata = new
-				{
-					location = $"https://www.twitch.tv/{targetUserName}"
-				},
-				description = args["targetDescriptionEscaped"].ToString()
-			}
+	    {
+	        name = args["targetChannelTitle"].ToString(),
+	        scheduled_start_time = DateTimeOffset.UtcNow.AddSeconds(5),
+	        scheduled_end_time = DateTimeOffset.UtcNow.AddDays(1),
+	        entity_type = 3,
+	        privacy_level = "2",
+	        entity_metadata = new
+	        {
+		    location = $"https://www.twitch.tv/{targetUserName}"
+		},
+	        description = args["targetDescriptionEscaped"].ToString()
+	    }
         );
         
         // Init and prep http POST call
         // You'll need your Discord bot's token with "Manage Events" permission
         using (HttpClient httpClient = new HttpClient())
         {
-        	var requestContent = new StringContent(content, Encoding.UTF8, "application/json");
-        	httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bot", "<discord-bot-token>");
+            var requestContent = new StringContent(content, Encoding.UTF8, "application/json");
+            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bot", "<discord-bot-token>");
             httpClient.PostAsync(url, requestContent).Wait();
             httpClient.Dispose();
             return true;
