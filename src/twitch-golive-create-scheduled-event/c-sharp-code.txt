@@ -15,8 +15,8 @@ public class CPHInline
         
         // Input vars
         var streamTitle = args["targetChannelTitle"].ToString();
-        var streamLocation = string.Concat("https://www.twitch.tv/", args["targetUserName"].ToString())
-        var streamDescription = args["targetDescriptionEscaped"].ToString()
+        var streamLocation = string.Concat("https://www.twitch.tv/", args["targetUserName"].ToString());
+        var streamDescription = args["targetDescriptionEscaped"].ToString();
         
         // Build API POST JSON payload (use an "Add target info for broadcaster" sub-action prior to "Execute Code")
         var content = JsonConvert.SerializeObject(new
