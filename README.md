@@ -27,3 +27,11 @@ Change Log:
 8/11/2023 - Initial Commit
 
 8/13/2023 - Add support for event specific logic (used to assist in "Go Offlne" code to only delete the event created during the "Go Live" event as to not blindly delete ALL events in case there are other events that we want to keep for other purposes.
+
+[twitch-updatestream-update-scheduled-event](https://github.com/ChillQuests/Streamer.bot/tree/main/src/twitch-updatestream-update-scheduled-event)
+
+If you update your stream information, this action will update the event title and descriptionof the existing "Go Live" event.
+
+Change Log:
+
+8/14/2023 - Initial Commit

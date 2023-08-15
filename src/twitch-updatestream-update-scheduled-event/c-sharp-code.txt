@@ -1,0 +1,69 @@
+using Newtonsoft.Json;
+using System;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Net;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+
+public class CPHInline
+{
+    private static readonly HttpClient _client = new();
+    private static string streamTitle;
+    private static string streamDescription;
+    private static int discordEventId = 0;
+
+    public bool Execute()
+    {
+        _client.BaseAddress = new Uri("https://discord.com/api/");
+
+        // Input vars
+        streamTitle = args["targetChannelTitle"].ToString();
+        streamDescription = args["targetDescriptionEscaped"].ToString();
+
+        // Get existing Discord Event Id
+        discordEventId = CPH.GetGlobalVar<int>("discordEventId", true);
+
+        // If we don't have an existing event running, simply exit out
+        if (discordEventId == 0)
+        {
+            return true;
+        }
+
+        UpdateEvent();
+        Thread.Sleep(5000);
+        return true;        
+    }
+    
+    private static async void UpdateEvent()
+	{
+		// Discord API endpoint for updating scheduled events
+		string url = $"guilds/<id-of-your-discord-server>/scheduled-events/{discordEventId}";
+
+		// Build API PATCH JSON payload (use an "Add target info for broadcaster" sub-action prior to "Execute Code")
+		var content = JsonConvert.SerializeObject(new
+		{
+			name = streamTitle,
+			description = streamDescription
+		});
+	
+		// Init and prep http PATCH call
+		// You'll need your Discord bot's token with "Manage Events" permission
+		_client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bot", "<discord-bot-token>");
+
+		// HttpClient doesn't support "Patch" out-of-the-box, so we have to instruct it a bit
+		// Clarification: .NET Core does, but Streamer.Bot seems to not use Core.. Yet.
+		var method = new HttpMethod("PATCH");
+		var request = new HttpRequestMessage(method, url)
+		{
+			Content = new StringContent(content, Encoding.UTF8, "application/json")
+		};
+
+		using (HttpResponseMessage response = _client.SendAsync(request).Result)
+		{
+			response.EnsureSuccessStatusCode();
+			string responseBody = await response.Content.ReadAsStringAsync();
+		}
+	}
+}
