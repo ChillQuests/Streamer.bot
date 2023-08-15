@@ -15,8 +15,8 @@ public class CPHInline
         
         // Input vars
         var streamTitle = args["targetChannelTitle"].ToString();
-        var streamLocation = string.Concat("https://www.twitch.tv/", args["targetUserName"].ToString())
-        var streamDescription = args["targetDescriptionEscaped"].ToString()
+        var streamLocation = string.Concat("https://www.twitch.tv/", args["targetUserName"].ToString());
+        var streamDescription = args["targetDescriptionEscaped"].ToString();
         
         // Build API POST JSON payload (use an "Add target info for broadcaster" sub-action prior to "Execute Code")
         var content = JsonConvert.SerializeObject(new
@@ -44,9 +44,15 @@ public class CPHInline
         var response = httpClient.PostAsync(url, requestContent).Result;
         if (response.Content != null && response.IsSuccessStatusCode)
         {
-            var jsonPayload = JsonConvert.DeserializeObject<dynamic>(response.Content.ReadAsStringAsync().Result);
-            CPH.SetGlobalVar("discordEventId", jsonPayload["id"], true);
+            var guildEvent = JsonConvert.DeserializeObject<GuildEvent>(response.Content.ReadAsStringAsync().Result);
+            CPH.SetGlobalVar("discordEventId", guildEvent.id, true);
         };
         return true;
+    }
+
+    // All we car about in this event is the event id
+    private class GuildEvent
+    {
+    	public int id {get; set;}
     }
 }

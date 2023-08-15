@@ -10,12 +10,12 @@ using System.Threading.Tasks;
 public class CPHInline
 {
     private static readonly HttpClient _client = new();
-    private int _eventId = 0;
+    private static int discordEventId = 0;
 
     public bool Execute()
     {
         _client.BaseAddress = new Uri("https://discord.com/api/");
-        _eventId = CPH.GetGlobalVar<int>("discordEventId", true);
+        discordEventId = CPH.GetGlobalVar<int>("discordEventId", true);
         RemoveEvent();
         Thread.Sleep(5000); // Since we can't 'force' the overried to async, I disappointingly added this to give the code enough time to complete before we exited out.
         return true;
@@ -23,7 +23,8 @@ public class CPHInline
 
     private static async void RemoveEvent()
     {
-        await DeleteAPIResponseAsync($"guilds/<id-of-your-discord-server>/scheduled-events/{_eventId}");
+        await DeleteAPIResponseAsync($"guilds/<id-of-your-discord-server>/scheduled-events/{discordEventId}");
+        CPH.SetGlobalVar("discordEventId", 0, true);
     }
 
     private static async Task<HttpStatusCode> DeleteAPIResponseAsync(string path)
