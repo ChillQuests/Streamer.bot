@@ -18,13 +18,13 @@ public class CPHInline
         discordEventId = CPH.GetGlobalVar<int>("discordEventId", true);
         RemoveEvent();
         Thread.Sleep(5000); // Since we can't 'force' the overried to async, I disappointingly added this to give the code enough time to complete before we exited out.
+        CPH.SetGlobalVar("discordEventId", 0, true);
         return true;
     }
 
     private static async void RemoveEvent()
     {
         await DeleteAPIResponseAsync($"guilds/<id-of-your-discord-server>/scheduled-events/{discordEventId}");
-        CPH.SetGlobalVar("discordEventId", 0, true);
     }
 
     private static async Task<HttpStatusCode> DeleteAPIResponseAsync(string path)
