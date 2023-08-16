@@ -10,6 +10,9 @@ using System.Threading.Tasks;
 public class CPHInline
 {
     private static readonly HttpClient _client = new();
+    private static string gameId;
+    private static string gameHeaderImageUri;
+    private static string gameHeaderImageData;
     private static string streamTitle;
     private static string streamDescription;
     private static int discordEventId = 0;
@@ -19,8 +22,32 @@ public class CPHInline
         _client.BaseAddress = new Uri("https://discord.com/api/");
 
         // Input vars
-        streamTitle = args["targetChannelTitle"].ToString();
-        streamDescription = args["targetDescriptionEscaped"].ToString();
+        gameId = args["gameId"].ToString();
+        streamTitle = args["gameName"].ToString();
+        streamDescription = args["status"].ToString();
+
+	// Steam API endpoint for game details (we only care about the main header image)
+        string steamAppUrl = "http://store.steampowered.com/api/appdetails?appids=";
+
+	// Get compatible game art from steam
+        using (HttpClient steamApiClient = new())
+        {
+            // Make first call to Steam API to get game details based on "gameId" from input vars
+            var gameDetail = steamApiClient.GetAsync(string.Concat(steamAppUrl, gameId)).Result;
+            if (gameDetail != null && gameDetail.IsSuccessStatusCode)
+            {
+                // Read results content and extract "header_image" value from payload
+                var gameDetailPayload = JObject.Parse(gameDetail.Content.ReadAsStringAsync().Result);
+                gameHeaderImageUri = (string)gameDetailPayload[gameId]["data"]["header_image"];
+
+                // Make second call to return and conmvert the game's main header image to Discord's required Data URI Scheme 
+                var gameHeaderImageDataResponse = steamApiClient.GetAsync(gameHeaderImageUri).Result;
+                if (gameHeaderImageDataResponse != null && gameHeaderImageDataResponse.IsSuccessStatusCode)
+                {
+                    gameHeaderImageData = "data:image/png;base64," + Convert.ToBase64String(gameHeaderImageDataResponse.Content.ReadAsByteArrayAsync().Result);
+                }
+            }
+        }
 
         // Get existing Discord Event Id
         discordEventId = CPH.GetGlobalVar<int>("discordEventId", true);
@@ -45,7 +72,8 @@ public class CPHInline
 		var content = JsonConvert.SerializeObject(new
 		{
 			name = streamTitle,
-			description = streamDescription
+			description = streamDescription,
+			image = gameHeaderImageData ?? null
 		});
 	
 		// Init and prep http PATCH call
