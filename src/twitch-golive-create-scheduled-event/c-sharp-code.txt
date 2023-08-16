@@ -12,11 +12,39 @@ public class CPHInline
     {
         // Discord API endpoint for creating scheduled events
         string url = "https://discord.com/api/guilds/<id-of-your-discord-server>/scheduled-events";
-        
-        // Input vars
+
+	// Steam API endpoint for game details (we want to pull the game's main header image)
+        string steamAppUrl = "http://store.steampowered.com/api/appdetails?appids=";
+
+	// Input vars
+	var gameId = args["gameId"].ToString();
         var streamTitle = args["targetChannelTitle"].ToString();
         var streamLocation = string.Concat("https://www.twitch.tv/", args["targetUserName"].ToString());
         var streamDescription = args["targetDescriptionEscaped"].ToString();
+
+	// Store results of Steam API call game header image
+        string gameHeaderImageUri = string.Empty;
+        string gameHeaderImageData = string.Empty;
+
+	// Get compatible game art from steam
+        using (HttpClient steamApiClient = new())
+        {
+            // Make first call to Steam API to get game details based on "gameId" from input vars
+            var gameDetail = steamApiClient.GetAsync(string.Concat(steamAppUrl, appId)).Result;
+            if (gameDetail != null && gameDetail.IsSuccessStatusCode)
+            {
+                // Read results content and extract "header_image" value from payload
+                var gameDetailPayload = JObject.Parse(gameDetail.Content.ReadAsStringAsync().Result);
+                gameHeaderImageUri = (string)gameDetailPayload[appId]["data"]["header_image"];
+
+                // Make second call to return and conmvert the game's main header image to Discord's required Data URI Scheme 
+                var gameHeaderImageDataResponse = steamApiClient.GetAsync(gameHeaderImageUri).Result;
+                if (gameHeaderImageDataResponse != null && gameHeaderImageDataResponse.IsSuccessStatusCode)
+                {
+                    gameHeaderImageData = "data:image/png;base64," + Convert.ToBase64String(gameHeaderImageDataResponse.Content.ReadAsByteArrayAsync().Result);
+                }
+            }
+        }
         
         // Build API POST JSON payload (use an "Add target info for broadcaster" sub-action prior to "Execute Code")
         var content = JsonConvert.SerializeObject(new
@@ -30,7 +58,8 @@ public class CPHInline
 	        {
 		        location = streamLocation
 		    },
-	        description = streamDescription
+	        description = streamDescription,
+            	image = gameHeaderImageData ?? null
 	    });
         
         // Init and prep http POST call
