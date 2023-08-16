@@ -5,6 +5,13 @@ Dicord Event within your server so anyone that is hanging out in your Discord wi
 
 Here's a screenshot of what a LIVE Event looks like in Discord when your Twitch stream goes live using this offering:
 
+View of a currently running event within your discord server:
+
+![Current LIVE Event](https://github.com/ChillQuests/Streamer.bot/blob/main/src/twitch-golive-create-scheduled-event/docs/created_event.png)
+
+When someon clicks on "Event Details", they will see all of the ... well, event details, including a nice image of the Steam provided game header image if one exists!
+
+![Event Details](https://github.com/ChillQuests/Streamer.bot/blob/main/src/twitch-golive-create-scheduled-event/docs/created_event_detail.png)
 
 The easiest way to install this offering is to use the Streamer.Bot "Import" function and copy/paste the contents of "import-code.txt" found [here](https://github.com/ChillQuests/Streamer.bot/blob/main/src/twitch-golive-create-scheduled-event/import-code.txt).
 
