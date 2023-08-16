@@ -41,7 +41,7 @@ public class CPHInline
                 var gameDetailPayload = JObject.Parse(gameDetail.Content.ReadAsStringAsync().Result);
                 
                 // Check to see if the call has a valid game record
-                if ((string)gameDetailPayload["success"] == "true")
+                if ((bool)gameDetailPayload[gameId]["success"] == true)
                 {
                     gameHeaderImageUri = (string)gameDetailPayload[gameId]["data"]["header_image"];
 
