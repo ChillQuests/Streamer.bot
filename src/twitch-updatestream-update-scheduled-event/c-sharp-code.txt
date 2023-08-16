@@ -1,4 +1,5 @@
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -25,11 +26,11 @@ public class CPHInline
         gameId = args["gameId"].ToString();
         streamTitle = args["gameName"].ToString();
         streamDescription = args["status"].ToString();
-
-	// Steam API endpoint for game details (we only care about the main header image)
+        
+        // Steam API endpoint for game details (we only care about the main header image)
         string steamAppUrl = "http://store.steampowered.com/api/appdetails?appids=";
-
-	// Get compatible game art from steam
+        
+        // Get compatible game art from steam
         using (HttpClient steamApiClient = new())
         {
             // Make first call to Steam API to get game details based on "gameId" from input vars
@@ -38,13 +39,18 @@ public class CPHInline
             {
                 // Read results content and extract "header_image" value from payload
                 var gameDetailPayload = JObject.Parse(gameDetail.Content.ReadAsStringAsync().Result);
-                gameHeaderImageUri = (string)gameDetailPayload[gameId]["data"]["header_image"];
-
-                // Make second call to return and conmvert the game's main header image to Discord's required Data URI Scheme 
-                var gameHeaderImageDataResponse = steamApiClient.GetAsync(gameHeaderImageUri).Result;
-                if (gameHeaderImageDataResponse != null && gameHeaderImageDataResponse.IsSuccessStatusCode)
+                
+                // Check to see if the call has a valid game record
+                if ((string)gameDetailPayload["success"] == "true")
                 {
-                    gameHeaderImageData = "data:image/png;base64," + Convert.ToBase64String(gameHeaderImageDataResponse.Content.ReadAsByteArrayAsync().Result);
+                    gameHeaderImageUri = (string)gameDetailPayload[gameId]["data"]["header_image"];
+
+                    // Make second call to return and conmvert the game's main header image to Discord's required Data URI Scheme 
+                    var gameHeaderImageDataResponse = steamApiClient.GetAsync(gameHeaderImageUri).Result;
+                    if (gameHeaderImageDataResponse != null && gameHeaderImageDataResponse.IsSuccessStatusCode)
+                    {
+                        gameHeaderImageData = "data:image/png;base64," + Convert.ToBase64String(gameHeaderImageDataResponse.Content.ReadAsByteArrayAsync().Result);
+                    }
                 }
             }
         }
@@ -64,34 +70,34 @@ public class CPHInline
     }
     
     private static async void UpdateEvent()
+    {
+	// Discord API endpoint for updating scheduled events
+	string url = $"guilds/<your-discord-server-id>/scheduled-events/{discordEventId}";
+
+	// Build API PATCH JSON payload (use an "Add target info for broadcaster" sub-action prior to "Execute Code")
+	var content = JsonConvert.SerializeObject(new
 	{
-		// Discord API endpoint for updating scheduled events
-		string url = $"guilds/<id-of-your-discord-server>/scheduled-events/{discordEventId}";
-
-		// Build API PATCH JSON payload (use an "Add target info for broadcaster" sub-action prior to "Execute Code")
-		var content = JsonConvert.SerializeObject(new
-		{
-			name = streamTitle,
-			description = streamDescription,
-			image = gameHeaderImageData ?? null
-		});
+		name = streamTitle,
+		description = streamDescription,
+		image = gameHeaderImageData
+	});
 	
-		// Init and prep http PATCH call
-		// You'll need your Discord bot's token with "Manage Events" permission
-		_client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bot", "<discord-bot-token>");
+	// Init and prep http PATCH call
+	// You'll need your Discord bot's token with "Manage Events" permission
+	_client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bot", "<your-discord-bot-token>");
 
-		// HttpClient doesn't support "Patch" out-of-the-box, so we have to instruct it a bit
-		// Clarification: .NET Core does, but Streamer.Bot seems to not use Core.. Yet.
-		var method = new HttpMethod("PATCH");
-		var request = new HttpRequestMessage(method, url)
-		{
-			Content = new StringContent(content, Encoding.UTF8, "application/json")
-		};
+	// HttpClient doesn't support "Patch" out-of-the-box, so we have to instruct it a bit
+	// Clarification: .NET Core does, but Streamer.Bot seems to not use Core.. Yet.
+	var method = new HttpMethod("PATCH");
+	var request = new HttpRequestMessage(method, url)
+	{
+		Content = new StringContent(content, Encoding.UTF8, "application/json")
+	};
 
-		using (HttpResponseMessage response = _client.SendAsync(request).Result)
-		{
-			response.EnsureSuccessStatusCode();
-			string responseBody = await response.Content.ReadAsStringAsync();
-		}
+	using (HttpResponseMessage response = _client.SendAsync(request).Result)
+	{
+		response.EnsureSuccessStatusCode();
+		string responseBody = await response.Content.ReadAsStringAsync();
 	}
+    }
 }
