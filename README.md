@@ -18,6 +18,8 @@ Change Log:
 
 8/13/2023 - Add support for event specific logic (used to assist in "Go Offlne" code to only delete the event created during the "Go Live" event as to not blindly delete ALL events in case there are other events that we want to keep for other purposes.
 
+8/16/2023 - Add support to handle scenario where steam does not have a record for the passed in gameId.
+
 [twitch-endstream-delete-events](https://github.com/ChillQuests/Streamer.bot/tree/main/src/twitch-endstream-delete-events)
 
 When your stream is finished and to go offline, this action will delete ONLY the event created during the "Go Live" event.
@@ -35,3 +37,5 @@ If you update your stream information, this action will update the event title a
 Change Log:
 
 8/14/2023 - Initial Commit
+
+8/16/2023 - Add support to handle scenario where steam does not have a record for the passed in gameId.
