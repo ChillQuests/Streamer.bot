@@ -17,3 +17,5 @@ Please be so kind and give me credit or let me know if you implement these offer
 
 This repositry is under active maintenance so star or watch this project to be notified if I'm uploading new stuff.
 I hope you find these useful!
+
+<a href="https://www.buymeacoffee.com/chillquests" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-red.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>
