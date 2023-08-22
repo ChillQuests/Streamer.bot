@@ -47,8 +47,8 @@ As a Twitch Streamer and Integration Software Developer, I personal use Streamer
 Here are just a few of the things I rely on Streamer.bot for during my streams:
 * Sending messages from my Twitch bot account, which acts as the community "mascot"
 * Set timed messages to run every X minutes or hours to keep my community in the know
-* Create Discord events and posts when my stream goes live so they know what I'm streaming and one-click their way over
-* Link protection to ensure only certain roles can post links in the chat, or link from white-listed domains are enforced
+* Create Discord Events when my stream goes live showing what I'm streaming
+* Link protection to ensure only certain roles can post links in the chat and white-listed domains
 * Twitch channel/community specific commands and responses
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
