@@ -29,6 +29,7 @@ public class CPHInline
         _discordEventId = CPH.GetGlobalVar<string>("discordEventId", true);
         RemoveEvent();
         Thread.Sleep(5000); // Since we can't 'force' the overried to async, I disappointingly added this to give the code enough time to complete before we exited out.
+        CPH.SetGlobalVar("discordEventId", string.Empty, true);
         return true;
     }
 
@@ -42,6 +43,7 @@ public class CPHInline
         _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bot", _discordServerBotToken);
         using HttpResponseMessage response = await _httpClient.DeleteAsync(path);
         response.EnsureSuccessStatusCode();
+        CPH.SetGlobalVar("discordEventId", string.Empty, true);
         return response.StatusCode;
     }
 }
