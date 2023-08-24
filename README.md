@@ -27,6 +27,9 @@
       <a href="#about-the-project">About The Project</a>
     </li>
     <li>
+      <a href="#news-and-updates">News and Updates</a>
+    </li>
+    <li>
       <a href="#getting-started">Getting Started</a>
     </li>
     <li><a href="#usage">Usage</a></li>
@@ -53,6 +56,16 @@ Here are just a few of the things I rely on Streamer.bot for during my streams:
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
+<!-- NEWS AND UPDATES -->
+## News and Updates
+
+All current offerings have been updated to support Streamer.bot 0.2.0!  The base engine hasn't changed in such a way where the current C# code will break, but
+the import/export functionality did require the need to re-create the import files/data and those have been included in each offering's "new" version
+based folders.  Please ensure that you select the correct version of my offerings if you plan to run them in as an import as 0.1.2.2 imports will not
+work with the 0.2.0 version of Streamer.bot, and vice-versa.
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
 <!-- GETTING STARTED -->
 ## Getting Started
 
@@ -73,6 +86,7 @@ _For more information on setting up Streamer.bot, please refer to the [Streamer.
 
 - [x] Add Discord Schedule Event Create/Update/Delete on Stream Activity
 - [x] Add Twitch Chat Link Protection
+- [x] Add imports that are compatible with Streamer.bot 0.2.0
 - [ ] Add Discord Announcement Post when Stream Goes Live
 - [ ] Add Discord Announcement Post Removal when Stream Goes Offline
 
